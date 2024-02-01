@@ -21,5 +21,4 @@ export async function getSummonerData(summonerName: string): Promise<any> {
         console.error(`An error occurred: ${error.message}`);
         throw error;
     }
-    return { name: summonerName, level: 30, /* Add other relevant data */ };
 }

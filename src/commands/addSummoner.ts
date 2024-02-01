@@ -1,5 +1,6 @@
 import {Command} from "../types";
 import {getSummonerData} from "./riotApiCalls/getSummonerData";
+import {addOrUpdateSummonerToDatabase} from "./dbCalls/addSummonerToDatabase";
 
 const command: Command = {
     name: "addSummoner",
@@ -16,9 +17,10 @@ const command: Command = {
             return message.channel.send("Summoner not found. Please check the name and try again.");
         }
 
+        console.log(summonerData);
         // Add summoner data to the database
-        //addSummonerToDatabase(summonerData);
-
+        addOrUpdateSummonerToDatabase(summonerData);
+        return
         message.channel.send(`Summoner ${summonerData.name} added to the database.`);
     },
     permissions: ["Administrator"],
