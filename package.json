@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "start": "cls && node build/index.js",
-        "build": "cls && node build.js"
+        "build": "cls && node build.js",
+        "build-and-start": "npm run build && npm start"
     },
     "keywords": [],
     "author": "MericcaN41",
@@ -13,9 +14,11 @@
     "dependencies": {
         "@discordjs/rest": "^1.1.0",
         "@types/node": "^18.7.14",
+        "axios": "^1.6.7",
         "chalk": "^4.1.2",
         "discord.js": "14.3.0",
         "dotenv": "^16.0.2",
+        "mongodb": "^6.3.0",
         "mongoose": "^6.5.4"
     },
     "devDependencies": {
