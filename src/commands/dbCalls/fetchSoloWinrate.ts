@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 
-export async function deleteSummonerFromDatabase(requestedSummonerName: string) {
+export async function fetchSoloWinrate() {
     const uri = process.env.MONGO_URI;
     const client = new MongoClient(uri);
 
@@ -9,15 +9,32 @@ export async function deleteSummonerFromDatabase(requestedSummonerName: string) 
         const database = client.db('summoners');
         const collection = database.collection('summonerData');
 
-        // Delete the summoner with the provided accountId
-        const deletionResult = await collection.deleteOne({ name: requestedSummonerName });
+        let soloWinrateMessage = ' \nSolo Queue WR\n\n';  // Make sure to initialize it as an empty string
 
-        if (deletionResult.deletedCount === 1) {
-            console.log(`${requestedSummonerName} removed successfully.`);
-        } else {
-            console.log(`${requestedSummonerName} not found in the database.`);
+        const summoners = await collection.find().toArray();
+
+        //sort summoners by winRateSolo
+        summoners.sort((a: any, b: any) => (b.winRateSolo > a.winRateSolo) ? 1 : -1);
+
+        for (const summoner of summoners) {
+            if (summoner.matchStats[0]) {
+
+                if (summoner.winRateSolo === 0) {
+                    soloWinrateMessage += `*${summoner.originalName}*: Placements not complete\n`;
+                } else {
+                    soloWinrateMessage += `*${summoner.originalName}*: ${summoner.matchStats[0].wins} wins, ${summoner.matchStats[0].losses} losses, ${summoner.winRateSolo}% winrate\n`;
+                }
+
+            } else {
+                soloWinrateMessage += `*${summoner.originalName}*: Placements not complete\n`;
+            }
+
+            console.log(soloWinrateMessage);
         }
+
+        return soloWinrateMessage;
     } finally {
         await client.close();
     }
 }
+

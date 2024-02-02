@@ -42,6 +42,38 @@ export async function fetchMatchStatsForAllSummoners(): Promise<number> {
                             { $set: { matchStats: matchStats } }
                         );
 
+                        // Initialize wins and losses for both queues
+                        let soloWins = 0;
+                        let soloLosses = 0;
+
+                        let flexWins = 0;
+                        let flexLosses = 0;
+
+                        for (const queue of matchStats) {
+                            if (queue.queueType === "RANKED_SOLO_5x5") {
+                                soloWins = queue.wins;
+                                soloLosses = queue.losses;
+                            } else if (queue.queueType === "RANKED_FLEX_SR") {
+                                flexWins = queue.wins;
+                                flexLosses = queue.losses;
+                            }
+                        }
+
+                        // Calculate win rates for both queues
+                        const soloWinRate = calculateWinRate(soloWins, soloLosses);
+                        const flexWinRate = calculateWinRate(flexWins, flexLosses);
+
+                        // Update the MongoDB collection with the win rates
+                        await collection.updateOne(
+                            { id: summoner.id },
+                            {
+                                $set: {
+                                    winRateSolo: soloWinRate,
+                                    winRateFlex: flexWinRate
+                                }
+                            }
+                        );
+
                         console.log(`Match stats for ${summoner.originalName} added to the database.`);
                     } else {
                         console.error(`Error fetching match stats. Status: ${response.status}, Message: ${await response.text()}`);
@@ -63,4 +95,14 @@ export async function fetchMatchStatsForAllSummoners(): Promise<number> {
         // Step 6: Close MongoDB connection
         await client.close();
     }
+}
+
+// Helper function to calculate win rate and round to 2 decimals
+function calculateWinRate(wins: number, losses: number) {
+    const totalGames = wins + losses;
+    if (totalGames === 0) {
+        return 0; // Handle division by zero
+    }
+    const winRate = (wins / totalGames) * 100;
+    return parseFloat(winRate.toFixed(2));
 }

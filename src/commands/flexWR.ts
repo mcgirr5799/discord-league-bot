@@ -1,10 +1,11 @@
 import {Command} from "../types";
 import {fetchMatchStatsForAllSummoners} from "./riotApiCalls/getSummonerStats";
-import {fetchSoloWinrate} from "./dbCalls/fetchSoloWinrate";
+import {fetchFlexWinrate} from "./dbCalls/fetchFlexWinrate";
+
 
 
 const command: Command = {
-    name: "soloWR",
+    name: "flexWR",
     execute: async (message, args) => {
         const fetchedSuccess = await fetchMatchStatsForAllSummoners();
 
@@ -12,8 +13,8 @@ const command: Command = {
             return message.channel.send("An error occurred while fetching match stats.");
         }
 
-        const soloQueueWinrate = await fetchSoloWinrate()
-        return message.channel.send(soloQueueWinrate);
+        const flexQueueWinrate = await fetchFlexWinrate()
+        return message.channel.send(flexQueueWinrate);
     },
     permissions: ["Administrator"],
     aliases: ["addSummoner"],
